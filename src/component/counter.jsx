@@ -1,4 +1,13 @@
-import React, { useState, useEffect, useContext, useReducer, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, {
+    useState,
+    useEffect,
+    useContext,
+    useReducer,
+    useRef,
+    useImperativeHandle,
+    forwardRef,
+    useCallback
+} from 'react';
 
 export function Example() {
     const [count, setCount] = useState(0);
@@ -9,8 +18,8 @@ export function Example() {
 
     return (
         <div>
-            <p>You clicked { count } times</p>
-                <button onClick={() => setCount(count + 1)}>Click me {count}</button>
+            <p>You clicked {count} times</p>
+            <button onClick={() => setCount(count + 1)}>Click me {count}</button>
         </div>
     )
 }
@@ -49,13 +58,14 @@ export function Form() {
         </div>
     )
 }
+
 const ChartAPI = {
-  subscribeToFriendStatus: function(friendID, handleStatusChange) {
-      return { friendID, handleStatusChange }
-  },
-  unsubscribeFromFriendStatus(friendID, handleStatusChange) {
-      return { friendID, handleStatusChange }
-  }
+    subscribeToFriendStatus: function (friendID, handleStatusChange) {
+        return {friendID, handleStatusChange}
+    },
+    unsubscribeFromFriendStatus(friendID, handleStatusChange) {
+        return {friendID, handleStatusChange}
+    }
 };
 
 function useFriendStatus(friendID) {
@@ -99,16 +109,16 @@ function FriendListItem(props) {
 }
 
 const friendList = [
-    { id: 1, name: 'Phoebe' },
-    { id: 2, name: 'Rachel' },
-    { id: 3, name: 'Ross' }
+    {id: 1, name: 'Phoebe'},
+    {id: 2, name: 'Rachel'},
+    {id: 3, name: 'Ross'}
 ];
 
 function ChatRecipientPicker() {
     const [recipientID, setRecipientID] = useState(1);
     const isRecipientOnline = useFriendStatus(recipientID);
 
-    return(
+    return (
         <>
             <div color={isRecipientOnline ? 'green' : 'red'}>
                 online
@@ -142,22 +152,22 @@ export function Counter({initialCount}) {
 }
 
 const themes = {
-  light: {
-      foreground: '#000',
-      background: '#eee',
-  },
-  dark: {
-      foreground: '#fff',
-      background: '#222'
+    light: {
+        foreground: '#000',
+        background: '#eee',
+    },
+    dark: {
+        foreground: '#fff',
+        background: '#222'
     }
 };
 
 const ThemeContext = React.createContext(themes.light);
 
 export function ExampleContext() {
-    return(
+    return (
         <ThemeContext.Provider value={themes.dark}>
-            <Toolbar />
+            <Toolbar/>
         </ThemeContext.Provider>
     )
 }
@@ -165,7 +175,7 @@ export function ExampleContext() {
 function Toolbar(props) {
     return (
         <div>
-            <ThemedButton />
+            <ThemedButton/>
         </div>
     )
 }
@@ -180,8 +190,9 @@ function ThemedButton() {
 }
 
 const initialState = {count: 0};
+
 function init(initialCount) {
-    return { count: initialCount }
+    return {count: initialCount}
 }
 
 function reducer(state, action) {
@@ -189,9 +200,9 @@ function reducer(state, action) {
         case 'increment':
             return {count: state.count + 1};
         case 'decrement':
-            return { count: state.count - 1};
+            return {count: state.count - 1};
         case 'reset':
-            return {count: action.payload };
+            return {count: action.payload};
         default:
             throw new Error();
     }
@@ -200,12 +211,12 @@ function reducer(state, action) {
 export function CounterRedux({initialCount}) {
     const [state, dispatch] = useReducer(reducer, initialCount, init);
 
-    return(
+    return (
         <>
             Count: {state.count}
-            <button onClick={() => dispatch({ type: 'reset', payload: initialCount })}>Reset</button>
-            <button onClick={() => dispatch({ type: 'decrement' })}>-</button>
-            <button onClick={() => dispatch({ type: 'increment' })}>+</button>
+            <button onClick={() => dispatch({type: 'reset', payload: initialCount})}>Reset</button>
+            <button onClick={() => dispatch({type: 'decrement'})}>-</button>
+            <button onClick={() => dispatch({type: 'increment'})}>+</button>
         </>
     )
 }
@@ -217,7 +228,7 @@ export function TextInputWithFocusButton() {
     };
     return (
         <>
-            <input type="text" ref={inputEl} />
+            <input type="text" ref={inputEl}/>
             <button onClick={onButtonClick}>Focus the input</button>
         </>
     )
@@ -226,13 +237,14 @@ export function TextInputWithFocusButton() {
 export function FancyInput(props, ref) {
     const inputRef = useRef();
     useImperativeHandle(ref, () => ({
-        focus: ()=> {
+        focus: () => {
             inputRef.current.focus();
-    }
+        }
     }));
 
-    return <input ref={inputRef} />
+    return <input ref={inputRef}/>
 }
+
 FancyInput = forwardRef(FancyInput);
 
 export function Box() {
@@ -247,14 +259,16 @@ export function Box() {
     const position = useWindowPosition();
     return <>
         <div style={{...style, ...position}}>square</div>
-        </>
+    </>
 }
 
 function useWindowPosition() {
     const [position, setPosition] = useState({left: 0, top: 0});
+
     function handleMouseMove(e) {
         setPosition(state => ({...state, left: e.pageX, top: e.pageY}));
     }
+
     useEffect(() => {
         window.addEventListener('mousemove', handleMouseMove);
 
@@ -266,5 +280,162 @@ function useWindowPosition() {
 
 export function GetPreviousProps() {
     const [count, setCount] = useState(0);
+    // const prevCountRef = useRef();
+    // useEffect(() => {
+    //     prevCountRef.current = count;
+    // });
+    // const prevCount = prevCountRef.current;
 
+    const prevCount = usePrevious(count);
+
+    return <>
+        <h1>Now: {count}, before: {prevCount}</h1>
+        <button onClick={() => setCount(count + 1)}>+</button>
+        <button onClick={() => setCount(0)}>Reset</button>
+    </>
+}
+
+function usePrevious(value) {
+    const ref = useRef();
+    useEffect(() => {
+        ref.current = value;
+    });
+
+    return ref.current;
+}
+
+export function WhyExample() {
+    const [count, setCount] = useState(0);
+    const ref = useRef();
+    useEffect(() => {
+        ref.current = count;
+    });
+
+    function handleAlertClick() {
+        setTimeout(() => {
+            alert('You clicked on:' + ref.current);
+        }, 3000);
+    }
+
+    return (
+        <div>
+            <p>You clicked {count} times</p>
+            <button onClick={() => setCount(count + 1)}>Click me</button>
+            <button onClick={handleAlertClick}>Show alert</button>
+        </div>
+    )
+}
+
+
+export function ScrollView({row}) {
+    let [isScrollingDown, setIsScrollingDown] = useState(false);
+    let [prevRow, setPrevRow] = useState(null);
+
+    if (row !== prevRow) {
+        setIsScrollingDown(prevRow !== null && row > prevRow);
+        setPrevRow(row);
+    }
+
+    return `Scrolling down: ${isScrollingDown}`;
+}
+
+export function MeasureExample() {
+    const [height, setHeight] = useState(0);
+
+    // const measuredRef = useCallback(node => {
+    //     if(node !== null) {
+    //         setHeight(node.getBoundingClientRect().height);
+    //     }
+    // }, []);
+
+    const [rect, ref] = useClientReact();
+
+    return (
+        <>
+            <h1 ref={ref}>Hello world</h1>
+            <h2>The above header is {Math.round(rect.height)}px tall</h2>
+        </>
+    )
+}
+
+function useClientReact() {
+    const [rect, setRect] = useState({});
+    const ref = useCallback(node => {
+        if (node !== null) {
+            setRect(node.getBoundingClientRect())
+        }
+    }, []);
+
+    return [rect, ref];
+}
+
+export function CounterWithInterval() {
+    const [count, setCount] = useState(0);
+
+    useEffect(() => {
+        const id = setInterval(() => {
+            setCount(c => c + 1);
+        }, 1000);
+
+        return () => clearInterval(id);
+    }, []);
+
+    return <h1>{count}</h1>
+}
+
+export function ExampleWithInterval(props) {
+    let latestProps = useRef(props);
+    useEffect(() => {
+        latestProps.current = props;
+    });
+
+    useEffect(() => {
+        function tick() {
+            console.log(latestProps.current)
+        }
+
+        const id = setInterval(tick, 1000);
+
+        return () => clearInterval(id);
+    }, []);
+}
+
+export function FormHowToRead() {
+    const [text, updateText] = useState('');
+    const textRef = useRef();
+
+    // useEffect(() => {
+    //     textRef.current = text;
+    // });
+    //
+    // const handleSubmit = useCallback(() => {
+    //     const currentText = textRef.current;
+    //     alert(currentText);
+    // }, [textRef]);
+
+    const handleSubmit = useEventCallback(() => {
+        alert(text);
+    }, [text]);
+
+    return (
+        <>
+            <input value={text} onChange={e => updateText(e.target.value)} />
+            <button onClick={handleSubmit}>Click</button>
+        </>
+    )
+}
+
+function useEventCallback(fn, dependencies) {
+    const ref = useRef(() => {
+        throw new Error(`Can't call event handler while rendering`);
+    });
+
+    useEffect(() => {
+        ref.current = fn;
+    }, [fn, ...dependencies]);
+
+    return useCallback(() => {
+        const fn = ref.current;
+        return fn();
+    }, [ref])
 }
