@@ -1,4 +1,5 @@
 import React, {
+    Component,
     useState,
     useEffect,
     useContext,
@@ -419,7 +420,7 @@ export function FormHowToRead() {
 
     return (
         <>
-            <input value={text} onChange={e => updateText(e.target.value)} />
+            <input value={text} onChange={e => updateText(e.target.value)}/>
             <button onClick={handleSubmit}>Click</button>
         </>
     )
@@ -438,4 +439,81 @@ function useEventCallback(fn, dependencies) {
         const fn = ref.current;
         return fn();
     }, [ref])
+}
+
+export class Button extends Component {
+    state = {
+        clicked: false
+    };
+
+    handleClick = () => {
+        this.setState({clicked: true})
+    };
+
+    render() {
+        if (this.state.clicked) {
+            return <h1>Thanks</h1>
+        }
+        return (
+            <button onClick={this.handleClick}>Click me</button>
+        )
+    }
+}
+
+export function AppFetch() {
+    // const defaultUrl = 'https://hn.algolia.com/api/v1/search?query=';
+    //
+    // const [data, setData] = useState([]);
+    const [query, setQuery] = useState('redux');
+    // const [url, setUrl] = useState(defaultUrl + 'redux');
+    // const [isLoading, setIsLoading] = useState(false);
+    // const [isError, setIsError] = useState(false);
+    const [{data, isLoading, isError, defaultUrl}, setUrl] = useHackerNewsApi();
+
+    return (
+        <>
+            <input
+                type="text"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+            />
+            <button type='button' onClick={() => setUrl(defaultUrl + query)}>Search</button>
+
+            {isLoading ? <h2>Loading</h2> : null}
+            {isError ? <h3>Something went wrong</h3> : null}
+            <ul>
+                {data && data.map(item => (
+                    <li key={item.objectID}>
+                        <a href={item.url}>{item.title}</a>
+                    </li>
+                ))}
+            </ul>
+        </>
+    )
+}
+
+function useHackerNewsApi() {
+    const [data, setData] = useState([]);
+    const defaultUrl = 'https://hn.algolia.com/api/v1/search?query=';
+    const [url, setUrl] = useState(defaultUrl + 'redux');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isError, setError] = useState(false);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            setIsLoading(true);
+            try {
+                const response = await fetch(url);
+                const result = await response.json();
+                setData(result.hits);
+                setIsLoading(false);
+            } catch (e) {
+                setError(true)
+            }
+        };
+
+        fetchData();
+    }, [url]);
+
+    return [{data, isLoading, isError, defaultUrl}, setUrl];
 }

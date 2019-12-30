@@ -14,7 +14,9 @@ import {
     ScrollView,
     MeasureExample,
     CounterWithInterval,
-    FormHowToRead
+    FormHowToRead,
+    Button,
+    AppFetch
 } from "./component/counter";
 import "./App.css";
 
@@ -45,6 +47,8 @@ function App() {
             <MeasureExample />
             <CounterWithInterval />
             <FormHowToRead />
+            <Button />
+            <AppFetch />
         </div>
     );
 }
