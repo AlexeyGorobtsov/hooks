@@ -572,3 +572,33 @@ const useDataApi = (initialUrl, initialData) => {
 
   return [state, setUrl];
 };
+
+export function FormExample() {
+    const [name, setName] = useState('Mary');
+    const [surname, setSurname] = useState('Poppins');
+    const [width, setWidth] = useState(window.innerWidth);
+
+    useEffect(() => {
+        const handleResize = () => setWidth(window.innerWidth);
+        window.addEventListener('resize', handleResize);
+
+        return () => window.removeEventListener('resize', handleResize);
+    });
+
+    function handleNameChange(e) {
+        setName(e.target.value);
+    }
+
+    function handleSurnameChange(e) {
+        setSurname(e.target.value);
+    }
+
+    return (
+        <>
+            <input type="text" value={name} onChange={handleNameChange}/>
+            <input type="text" value={surname} onChange={handleSurnameChange}/>
+            <p>Hello {name}, {surname}</p>
+            <p>Window width {width}</p>
+        </>
+    )
+}

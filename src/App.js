@@ -16,7 +16,9 @@ import {
     CounterWithInterval,
     FormHowToRead,
     Button,
-    AppFetch
+    AppFetch,
+    FormExample
+
 } from "./component/counter";
 import "./App.css";
 
@@ -49,6 +51,7 @@ function App() {
             <FormHowToRead />
             <Button />
             <AppFetch />
+            <FormExample/>
         </div>
     );
 }
